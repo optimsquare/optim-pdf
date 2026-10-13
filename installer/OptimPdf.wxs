@@ -1,0 +1,105 @@
+<!--
+  Optim PDF installer (WiX Toolset 5). Build with installer\build.ps1.
+  Installs per-machine (Program Files) when run as administrator, otherwise per-user (no admin rights needed).
+  Registers Optim PDF for .pdf in "Open with" and Windows Default apps, without taking over the current default.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Package Name="Optim PDF" Manufacturer="Optim Square LLC" Version="$(var.Version)"
+           UpgradeCode="6C1A7C35-2B61-4E56-9B0E-4F2D6F0A8A11" Scope="perUserOrMachine" Language="1033" Compressed="yes">
+    <SummaryInformation Description="Optim PDF — PDF editor for Windows" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Optim PDF is already installed." Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="AppIcon.ico" SourceFile="..\src\OptimPdf.App\Assets\OptimPdf.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
+    <Property Id="ARPCONTACT" Value="Optim Square LLC" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <!--
+      Install location follows the install scope: "Everyone" → Program Files, "Just me" → the user's profile.
+      The dialog lets users choose; silent installs use ALLUSERS=1 (per-machine) or MSIINSTALLPERUSER=1 (per-user).
+    -->
+    <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+    <SetProperty Id="WixAppFolder" Value="WixPerUserFolder" Before="AppSearch" Sequence="both"
+                 Condition="MSIINSTALLPERUSER = 1 OR ALLUSERS = &quot;&quot;" />
+    <!-- WixUI_Advanced defaults to the 32-bit Program Files (x86); Optim PDF is 64-bit. -->
+    <SetProperty Id="WixPerMachineFolder" Value="[ProgramFiles64Folder][ApplicationFolderName]" After="WixSetDefaultPerMachineFolder" Sequence="both" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="CompanyFolder" Name="Optim Square">
+        <Directory Id="APPLICATIONFOLDER" Name="Optim PDF">
+          <Directory Id="LicensesFolder" Name="licenses" />
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder" />
+    <StandardDirectory Id="DesktopFolder" />
+
+    <Feature Id="Main" Title="Optim PDF" Description="The application." Level="1" AllowAbsent="no" ConfigurableDirectory="APPLICATIONFOLDER">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentGroupRef Id="LicenseFiles" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="PdfRegistration" />
+    </Feature>
+    <Feature Id="Desktop" Title="Desktop shortcut" Level="1">
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+
+    <ui:WixUI Id="WixUI_Advanced" />
+    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
+    <Property Id="ApplicationFolderName" Value="Optim Square\Optim PDF" />
+
+    <!-- Offer to start the app at the end. -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Start Optim PDF" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <CustomAction Id="LaunchOptimPdf" DllEntry="WixShellExec" BinaryRef="Wix4UtilCA_X64" Impersonate="yes" />
+    <UI>
+      <Publish Dialog="ExitDialog" Control="Finish" Property="WixShellExecTarget" Value="[APPLICATIONFOLDER]OptimPdf.exe" Order="1" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchOptimPdf" Order="2"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
+    </UI>
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="AppFiles" Directory="APPLICATIONFOLDER">
+      <Files Include="$(var.PublishDir)\**">
+        <Exclude Files="$(var.PublishDir)\**\*.pdb" />
+      </Files>
+    </ComponentGroup>
+    <ComponentGroup Id="LicenseFiles" Directory="LicensesFolder">
+      <Files Include="licenses\**" />
+    </ComponentGroup>
+
+    <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder" Guid="2D3B8F55-4E1C-4B7A-9C51-0B0E1C4D9A21">
+      <Shortcut Id="StartMenuOptimPdf" Name="Optim PDF" Description="View, edit, sign and convert PDFs"
+                Target="[APPLICATIONFOLDER]OptimPdf.exe" WorkingDirectory="APPLICATIONFOLDER" Icon="AppIcon.ico" />
+      <RegistryValue Root="HKMU" Key="Software\Optim Square\Optim PDF" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="7F0B6C1E-9A3D-4E2B-8C64-3B5D2E9F1A44">
+      <Shortcut Id="DesktopOptimPdf" Name="Optim PDF" Target="[APPLICATIONFOLDER]OptimPdf.exe" WorkingDirectory="APPLICATIONFOLDER" Icon="AppIcon.ico" />
+      <RegistryValue Root="HKMU" Key="Software\Optim Square\Optim PDF" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <!--
+      PDF registration without changing the user's default: a ProgID, "Open with" entry and Default apps
+      capabilities. Windows lets the user pick Optim PDF as default; the installer never forces it.
+    -->
+    <Component Id="PdfRegistration" Directory="APPLICATIONFOLDER" Guid="A4E7C2D9-1B3F-4C8E-9D20-5E6F7A8B9C33">
+      <RegistryValue Root="HKMU" Key="Software\Classes\OptimSquare.OptimPDF.Document" Value="PDF Document" Type="string" KeyPath="yes" />
+      <RegistryValue Root="HKMU" Key="Software\Classes\OptimSquare.OptimPDF.Document" Name="FriendlyTypeName" Value="PDF Document" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Classes\OptimSquare.OptimPDF.Document\DefaultIcon" Value="[APPLICATIONFOLDER]OptimPdf.exe,0" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Classes\OptimSquare.OptimPDF.Document\shell\open\command" Value="&quot;[APPLICATIONFOLDER]OptimPdf.exe&quot; &quot;%1&quot;" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Classes\.pdf\OpenWithProgids" Name="OptimSquare.OptimPDF.Document" Value="" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Classes\Applications\OptimPdf.exe\SupportedTypes" Name=".pdf" Value="" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Classes\Applications\OptimPdf.exe\shell\open\command" Value="&quot;[APPLICATIONFOLDER]OptimPdf.exe&quot; &quot;%1&quot;" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Optim Square\Optim PDF\Capabilities" Name="ApplicationName" Value="Optim PDF" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Optim Square\Optim PDF\Capabilities" Name="ApplicationDescription" Value="View, edit, sign and convert PDF documents." Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Optim Square\Optim PDF\Capabilities\FileAssociations" Name=".pdf" Value="OptimSquare.OptimPDF.Document" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\RegisteredApplications" Name="Optim PDF" Value="Software\Optim Square\Optim PDF\Capabilities" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\OptimPdf.exe" Value="[APPLICATIONFOLDER]OptimPdf.exe" Type="string" />
+    </Component>
+  </Fragment>
+</Wix>

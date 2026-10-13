@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\OptimPdf.Core\OptimPdf.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <AssemblyName>OptimPdf</AssemblyName>
+    <RootNamespace>OptimPdf.App</RootNamespace>
+    <ApplicationIcon>Assets\OptimPdf.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- WPF Fluent theme (ThemeMode) is marked experimental. -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
+
+    <Product>Optim PDF</Product>
+    <Company>Optim Square LLC</Company>
+    <Authors>Optim Square LLC</Authors>
+    <Copyright>© 2026 Optim Square LLC</Copyright>
+    <Description>Optim PDF — PDF viewer and editor for Windows</Description>
+    <Version>0.4.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\OptimPdf.ico" />
+    <Resource Include="Assets\OptimPdf-256.png" />
+    <SplashScreen Include="Assets\Splash.png" />
+    <None Include="..\..\THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,52 @@
+Optim PDF — Third-party notices
+© 2026 Optim Square LLC. Optim PDF itself is licensed under the MIT License (see LICENSE).
+
+Optim PDF includes the following third-party components. Each is used under the license shown.
+Full license texts are in the "licenses" folder of the installation directory.
+
+1. PDFium
+   Copyright 2014 The PDFium Authors
+   License: BSD 3-Clause (PDFium); bundled third-party parts under their own permissive licenses
+   (Apache-2.0, BSD, MIT, zlib, libjpeg, FreeType Project License)
+   https://pdfium.googlesource.com/pdfium/
+
+2. bblanchon/pdfium-binaries (prebuilt pdfium.dll)
+   Copyright 2014-2025 Benoit Blanchon
+   License: MIT (build scripts); the PDFium binary itself is under the licenses above
+   (full texts in licenses\pdfium: abseil, agg23, fast_float, freetype, icu, lcms, libjpeg-turbo,
+   libopenjpeg, libpng, llvm-libc, pdfium, simdutf, zlib)
+   https://github.com/bblanchon/pdfium-binaries
+
+3. PDFiumCore (.NET bindings)
+   Copyright Dan Tecson and contributors
+   License: Apache License 2.0
+   https://github.com/Dtronix/PDFiumCore
+
+4. PDFsharp 6
+   Copyright (c) 2005-2025 empira Software GmbH, Troisdorf (Germany)
+   License: MIT
+   https://github.com/empira/PDFsharp
+
+5. Microsoft .NET runtime and WPF (included with the application)
+   Copyright (c) .NET Foundation and Contributors
+   License: MIT
+   https://github.com/dotnet/runtime, https://github.com/dotnet/wpf
+
+6. System.Drawing.Common and System.Security.Cryptography.ProtectedData
+   Copyright (c) .NET Foundation and Contributors
+   License: MIT
+   https://github.com/dotnet/runtime
+
+7. C#/WinRT projection (Microsoft.Windows.SDK.NET.dll, WinRT.Runtime.dll), used for the Windows OCR engine
+   Copyright (c) Microsoft Corporation
+   License: MIT
+   https://github.com/microsoft/CsWinRT
+
+Optim PDF also uses components of Windows and, when the user has installed it, Microsoft Office:
+- Text recognition uses the OCR engine built into Windows 10/11 (Windows.Media.Ocr). Nothing is redistributed.
+- Office to PDF conversion automates the user's own licensed Microsoft Office. Nothing is redistributed.
+- Digital signatures use the Windows certificate store and .NET cryptography (System.Security.Cryptography.Pkcs, MIT).
+
+Fonts: Optim PDF embeds subsets of fonts installed on the user's PC into documents the user creates.
+Fonts whose license forbids embedding (OS/2 fsType "restricted license") are never embedded.
+No fonts are distributed with Optim PDF.

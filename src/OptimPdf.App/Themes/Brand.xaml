@@ -1,0 +1,182 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Optim Square identity -->
+    <Color x:Key="Brand.IndigoColor">#0B5CD6</Color>  <!-- logo blue -->
+    <Color x:Key="Brand.TealColor">#14C3B4</Color>  <!-- logo teal -->
+    <SolidColorBrush x:Key="Brand.Indigo" Color="{StaticResource Brand.IndigoColor}" />
+    <SolidColorBrush x:Key="Brand.Teal" Color="{StaticResource Brand.TealColor}" />
+    <LinearGradientBrush x:Key="Brand.Gradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0" Color="{StaticResource Brand.IndigoColor}" />
+        <GradientStop Offset="1" Color="{StaticResource Brand.TealColor}" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Viewer.SearchHit" Color="#66FFB020" />
+    <SolidColorBrush x:Key="Viewer.SearchHitCurrent" Color="#AAFF7A00" />
+    <SolidColorBrush x:Key="Viewer.Selection" Color="#550B5CD6" />
+
+    <!--
+        Theme-dependent chrome colors. These are the light-theme values; App.ApplyPalette replaces
+        them for dark mode, so always reference them with DynamicResource.
+        Contrast targets (WCAG): text and icons ≥ 4.5:1 on Chrome.Header, accents ≥ 3:1.
+    -->
+    <SolidColorBrush x:Key="Brand.Accent" Color="#0A57C2" />          <!-- accent text/icons -->
+    <SolidColorBrush x:Key="Brand.AccentSubtle" Color="#DCEBFF" />    <!-- selected tool background -->
+    <SolidColorBrush x:Key="Chrome.Header" Color="#F3F4F8" />         <!-- title, ribbon, status bar -->
+    <SolidColorBrush x:Key="Chrome.TabStrip" Color="#E7E8EE" />       <!-- document tab strip -->
+    <SolidColorBrush x:Key="Chrome.Border" Color="#D4D6DE" />
+    <SolidColorBrush x:Key="Chrome.Text" Color="#1B1B1F" />
+    <SolidColorBrush x:Key="Chrome.TextSecondary" Color="#55575F" />
+    <SolidColorBrush x:Key="Chrome.Hover" Color="#E3E5EC" />
+    <SolidColorBrush x:Key="Chrome.Pressed" Color="#D6D9E2" />
+    <SolidColorBrush x:Key="Chrome.SearchBox" Color="#FFFFFF" />
+
+    <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+    <!-- Ribbon command: icon above label -->
+    <Style x:Key="RibbonButton" TargetType="ButtonBase">
+        <Setter Property="MinWidth" Value="60" />
+        <Setter Property="Height" Value="60" />
+        <Setter Property="Padding" Value="6,4" />
+        <Setter Property="Margin" Value="1,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Chrome.Text}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ButtonBase">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}"
+                            BorderThickness="1" BorderBrush="Transparent">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="20"
+                                       HorizontalAlignment="Center" Margin="0,2,0,4" />
+                            <ContentPresenter HorizontalAlignment="Center" TextBlock.FontSize="11.5" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Chrome.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Chrome.Pressed}" />
+                        </Trigger>
+                        <Trigger Property="ToggleButton.IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brand.AccentSubtle}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Brand.Accent}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Brand.Accent}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Chrome.Text}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.38" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="Button" x:Key="RibbonCommand" BasedOn="{StaticResource RibbonButton}" />
+    <Style TargetType="RadioButton" x:Key="RibbonTool" BasedOn="{StaticResource RibbonButton}">
+        <Setter Property="GroupName" Value="Tools" />
+    </Style>
+
+    <!-- Ribbon group: commands with a caption underneath and a divider on the right -->
+    <Style x:Key="RibbonGroup" TargetType="HeaderedContentControl">
+        <Setter Property="Margin" Value="0,0,4,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="HeaderedContentControl">
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <DockPanel Margin="4,0,8,0">
+                            <TextBlock DockPanel.Dock="Bottom" Text="{TemplateBinding Header}" FontSize="10.5"
+                                       HorizontalAlignment="Center" Margin="0,3,0,0" Opacity="0.85"
+                                       Foreground="{DynamicResource Chrome.TextSecondary}" />
+                            <ContentPresenter />
+                        </DockPanel>
+                        <Border Grid.Column="1" Width="1" Margin="0,8,0,10" Background="{DynamicResource Chrome.Border}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Ribbon tab header: full-contrast text, accent underline on the selected tab -->
+    <Style x:Key="RibbonTabItem" TargetType="TabItem">
+        <Setter Property="Foreground" Value="{DynamicResource Chrome.TextSecondary}" />
+        <Setter Property="FontSize" Value="13.5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Grid Margin="0,0,2,0" Background="Transparent">
+                        <Border x:Name="Bd" CornerRadius="6" Padding="14,7,14,8" Background="Transparent">
+                            <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" />
+                        </Border>
+                        <Border x:Name="Underline" Height="3" CornerRadius="1.5" Width="22" VerticalAlignment="Bottom"
+                                Background="{DynamicResource Brand.Accent}" Visibility="Hidden" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Chrome.Hover}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Chrome.Text}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource Chrome.Text}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter TargetName="Underline" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Quick-access and header buttons: icon only, quiet until hovered -->
+    <Style x:Key="QatButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Width" Value="34" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Margin" Value="1,0" />
+        <Setter Property="Foreground" Value="{DynamicResource Chrome.Text}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" CornerRadius="6" Background="Transparent" BorderThickness="1" BorderBrush="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Chrome.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Chrome.Pressed}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Chrome.Text}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.38" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Small icon button for panels and the status bar -->
+    <Style x:Key="IconButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="2,0" />
+    </Style>
+</ResourceDictionary>

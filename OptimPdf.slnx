@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OptimPdf.App/OptimPdf.App.csproj" />
+    <Project Path="src/OptimPdf.Core/OptimPdf.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OptimPdf.Core.Tests/OptimPdf.Core.Tests.csproj" />
+  </Folder>
+</Solution>
